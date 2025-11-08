@@ -28,3 +28,6 @@
 
 -keep class io.live.timas.hook.HookEntry { *; }
 -keep,allowobfuscation class io.live.timas.ui.SettingActivity { *; }
+
+# ProtoBuf 相关
+-keepclassmembers public class * extends com.google.protobuf.MessageLite {*;}
