@@ -74,7 +74,7 @@ class TIMMsgViewAdapter : XBridge() {
             if (aioMsgItem == null || msgView == null) return@hookAfter
 
             val msgRecord: Any = MethodUtils.create(aioMsgItem.javaClass).methodName("getMsgRecord")
-                .callFirst(aioMsgItem)
+                .invokeFirst(aioMsgItem)
 
             val elements: ArrayList<Any> = FieldUtils.getField(
                 msgRecord, "elements",

@@ -8,7 +8,6 @@ import de.robv.android.xposed.XposedBridge
 import io.live.timas.hook.utils.XLog
 import top.sacz.xphelper.XpHelper
 import top.sacz.xphelper.dexkit.MethodFinder
-import top.sacz.xphelper.reflect.ConstructorUtils
 import java.lang.reflect.Member
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -42,7 +41,7 @@ abstract class XBridge {
                 onHook(XpHelper.context, XpHelper.classLoader)
             }
         } catch (e: Throwable) {
-            XLog.e("Hook加载失败", e)
+            XLog.e(e)
         }
     }
 
@@ -116,8 +115,8 @@ abstract class XBridge {
         )
     }
 
-    protected fun ConstructorUtils.hookBefore(action: HookAction): Unhook? {
-        val member = first()
+    protected fun MethodFinder.hookConstructorBefore(action: HookAction): Unhook? {
+        val member = firstConstructor()
         return registerUnhook(
             XposedBridge.hookMethod(member, createHookCallback(null, action, isBefore = true))
         )
@@ -155,8 +154,8 @@ abstract class XBridge {
         )
     }
 
-    protected fun ConstructorUtils.hookAfter(action: HookAction): Unhook? {
-        val member = first()
+    protected fun MethodFinder.hookConstructorAfter(action: HookAction): Unhook? {
+        val member = firstConstructor()
         return registerUnhook(
             XposedBridge.hookMethod(member, createHookCallback(null, action, isBefore = false))
         )
@@ -182,7 +181,7 @@ abstract class XBridge {
             // 调用带接收者的 lambda
             param.hookAction()
         } catch (throwable: Throwable) {
-            XLog.e("Hook执行失败", throwable)
+            XLog.e(throwable)
         }
     }
 
@@ -197,7 +196,7 @@ abstract class XBridge {
             unhookRefs.clear()
             isLoad = false
         } catch (e: Throwable) {
-            XLog.e("卸载Hook失败", e)
+            XLog.e(e)
         }
     }
 }

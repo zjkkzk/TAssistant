@@ -28,7 +28,7 @@ object InjectSetting : XBridge() {
                 val list = result as? List<*> ?: return@hookAfter
                 processSettingList(ctx, list)?.let { result = it }
             } catch (e: Exception) {
-                XLog.e("Hook MainSettingConfigProvider 失败", e)
+                XLog.e("Hook MainSettingConfigProvider 失败: $e")
             }
         }
     }
@@ -141,7 +141,7 @@ object InjectSetting : XBridge() {
                     startSettingsActivity(context)
                 }
             } catch (e: Exception) {
-                XLog.e("点击处理失败", e)
+                XLog.e(e)
             }
             return null
         }

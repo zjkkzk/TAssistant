@@ -50,7 +50,7 @@ class TIMMessageViewListener : XBridge() {
     private fun onViewUpdate(aioMsgItem: Any, msgView: View) {
         val msgRecord: Any = MethodUtils.create(aioMsgItem.javaClass)
             .methodName("getMsgRecord")
-            .callFirst(aioMsgItem)
+            .invokeFirst(aioMsgItem)
 
         for ((_, listener) in ON_AIO_CHAT_VIEW_UPDATE_LISTENER_MAP.entries) {
             listener.onViewUpdateAfter(msgView, msgRecord)

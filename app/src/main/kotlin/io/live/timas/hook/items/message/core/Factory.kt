@@ -30,7 +30,7 @@ object Factory {
                         newInstance as T
                     }
                 } catch (e: Exception) {
-                    XLog.e("Factory.getItem失败: ${clazz.name}", e)
+                    XLog.e("Factory.getItem失败: ${clazz.name}\n $e")
                     null
                 }
             }

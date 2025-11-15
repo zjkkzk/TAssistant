@@ -1,7 +1,7 @@
 [versions]
 
 # Plugins
-agp = "9.0.0-alpha11"
+agp = "9.0.0-alpha14"
 kotlin = "2.3.0-Beta2"
 protobuf = "0.9.5"
 ksp = "2.3.2"
@@ -15,7 +15,7 @@ lsparanoid = "0.6.0"
 
 # Xposed
 xposed = "82"
-xpHelper = "dcecc33f56"
+xpHelper = "2.9"
 
 # Json
 fastjson2 = "2.0.60"

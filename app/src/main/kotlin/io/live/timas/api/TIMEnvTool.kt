@@ -13,7 +13,7 @@ object TIMEnvTool {
             return MethodUtils.create(runTime)
                 .methodName("getCurrentNickname")
                 .returnType(String::class.java)
-                .callFirst(runTime)
+                .invokeFirst(runTime)
         } catch (_: Exception) {
             return null
         }
@@ -25,7 +25,7 @@ object TIMEnvTool {
             return MethodUtils.create(runTime)
                 .methodName("getCurrentAccountUin")
                 .returnType(String::class.java)
-                .callFirst(runTime)
+                .invokeFirst(runTime)
         } catch (_: Exception) {
             return null
         }
@@ -36,12 +36,12 @@ object TIMEnvTool {
             MethodUtils.create(ClassUtils.findClass("com.tencent.common.app.BaseApplicationImpl"))
                 .methodName("getApplication")
                 .returnType(ClassUtils.findClass("com.tencent.common.app.BaseApplicationImpl"))
-                .callFirstStatic()
+                .invokeFirstStatic()
 
         return MethodUtils.create(application)
             .methodName("getRuntime")
             .returnType(ClassUtils.findClass("mqq.app.AppRuntime"))
-            .callFirst(application)
+            .invokeFirst(application)
     }
 
     /**
@@ -66,6 +66,6 @@ object TIMEnvTool {
         return MethodUtils.create("com.tencent.mobileqq.qroute.QRoute")
             .methodName("api")
             .params(Class::class.java)
-            .callFirstStatic(clz)
+            .invokeFirstStatic(clz)
     }
 }

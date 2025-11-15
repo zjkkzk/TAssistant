@@ -13,8 +13,7 @@ object XLog {
     fun w(msg: Any? = null) {
         XposedBridge.log("[${R.string.app_name}/W] $msg")
     }
-    fun e(msg: Any? = null, e: Throwable) {
+    fun e(msg: Any? = null) {
         XposedBridge.log("[${R.string.app_name}/E] $msg")
-        XposedBridge.log(e)
     }
 }

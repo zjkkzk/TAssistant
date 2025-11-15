@@ -5,8 +5,8 @@ import android.view.View
 import io.live.timas.annotations.RegisterToUI
 import io.live.timas.annotations.UiCategory
 import io.live.timas.hook.base.SwitchHook
+import top.sacz.xphelper.dexkit.DexFinder
 import top.sacz.xphelper.ext.toClass
-import top.sacz.xphelper.reflect.ConstructorUtils
 import top.sacz.xphelper.reflect.FieldUtils
 
 @RegisterToUI
@@ -25,20 +25,22 @@ object HideQzoneVipTip : SwitchHook() {
             "com.qzone.reborn.feedx.widget.header.QZoneFeedxHeaderVipElement".toClass()
         val targetClass2 = "com.qzone.reborn.feedx.widget.header.ax".toClass()
 
-        ConstructorUtils.create(targetClass1)
-            .paramTypes(View::class.java)
-            .hookAfter {
-                FieldUtils.create(thisObject)
-                    .fieldName("h")
-                    .setFirst(thisObject, null)
-            }
+        DexFinder.findMethod {
+            declaredClass = targetClass1
+            parameters = arrayOf(View::class.java)
+        }.hookConstructorAfter {
+            FieldUtils.create(thisObject)
+                .fieldName("h")
+                .setFirst(thisObject, null)
+        }
 
-        ConstructorUtils.create(targetClass2)
-            .paramTypes(View::class.java)
-            .hookAfter {
-                FieldUtils.create(thisObject)
-                    .fieldName("h")
-                    .setFirst(thisObject, null)
-            }
+        DexFinder.findMethod {
+            declaredClass = targetClass2
+            parameters = arrayOf(View::class.java, Boolean::class.java)
+        }.hookConstructorAfter {
+            FieldUtils.create(thisObject)
+                .fieldName("h")
+                .setFirst(thisObject, null)
+        }
     }
 }

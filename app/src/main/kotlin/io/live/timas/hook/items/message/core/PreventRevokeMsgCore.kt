@@ -312,11 +312,11 @@ object PreventRevokeMsgCore {
                     ) { _, _, _ -> null }
                     addMethod.invoke(msgService, contact, element, true, true, proxy)
                 }.onFailure { e ->
-                    XLog.e("addLocalJsonGrayTipMsg failed", e)
+                    XLog.e(e)
                 }
             }
         }.onFailure { e ->
-            XLog.e("tryAddLocalGrayTip error", e)
+            XLog.e(e)
         }
     }
 

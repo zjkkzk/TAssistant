@@ -121,7 +121,7 @@ object LocalGrayTips {
                 addMethod.invoke(msgService, contact, element, true, true, proxy)
             }
         }.onFailure { e ->
-            XLog.e("LocalGrayTips.send error", e)
+            XLog.e(e)
         }
     }
 }

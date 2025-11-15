@@ -29,7 +29,7 @@ class TIMSendMsgTool {
             )
             .returnType(Void.TYPE)
             .methodName("sendMsg")
-            .callFirst<Any>(
+            .invokeFirst<Any>(
                 msgServer,
                 contact,
                 elementList,

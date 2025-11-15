@@ -42,7 +42,7 @@ object GroupNickResolver {
             } ?: return null
             NickInfo(text)
         }.onFailure { e ->
-            XLog.e("GroupNickResolver error", e)
+            XLog.e(e)
         }.getOrNull()
     }
 }
