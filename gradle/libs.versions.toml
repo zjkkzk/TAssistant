@@ -1,14 +1,14 @@
 [versions]
 
 # Plugins
-agp = "9.0.0-alpha14"
-kotlin = "2.3.0-Beta2"
+agp = "9.0.0-beta05"
+kotlin = "2.3.0-RC3"
 protobuf = "0.9.5"
 ksp = "2.3.2"
 
 coreKtx = "1.17.0"
 appcompat = "1.7.1"
-material = "1.14.0-alpha06"
+material = "1.14.0-alpha07"
 
 # LSParanoid
 lsparanoid = "0.6.0"
@@ -21,7 +21,7 @@ xpHelper = "2.9"
 fastjson2 = "2.0.60"
 
 # ProtoBuf
-protobuf-javalite = "4.33.0"
+protobuf-javalite = "4.33.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
