@@ -40,7 +40,8 @@ class HookSteps {
             }.getOrNull()
     }
     fun initHook() {
-        ApiItemsManager.loadAllApiItems()
         HookManager.loadEnabledHooks()
+        ApiItemsManager.processor()
+        ApiItemsManager.loadAllApiItems()
     }
 }
