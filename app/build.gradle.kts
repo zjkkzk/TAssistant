@@ -80,6 +80,9 @@ dependencies {
     compileOnly(libs.xposed.api)
     implementation(libs.xphelper)
 
+    // ByteBuddy
+    implementation(libs.byte.buddy.android)
+
     // Json
     implementation(libs.fastjson2)
 

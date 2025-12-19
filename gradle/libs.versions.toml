@@ -17,6 +17,9 @@ lsparanoid = "0.6.0"
 xposed = "82"
 xpHelper = "2.9"
 
+# ByteBuddy
+byteBuddy = "1.18.2"
+
 # Json
 fastjson2 = "2.0.60"
 
@@ -34,6 +37,9 @@ lsparanoid = { group = "org.lsposed.lsparanoid", name = "gradle-plugin", version
 # Xposed
 xposed-api = { group = "de.robv.android.xposed", name = "api", version.ref = "xposed" }
 xphelper = { group = "com.github.suzhelan", name = "XPHelper", version.ref = "xpHelper" }
+
+# BytyBuddy-Android
+byte-buddy-android = { group = "net.bytebuddy", name = "byte-buddy-android", version.ref = "byteBuddy" }
 
 # KSP
 ksp-api = { group = "com.google.devtools.ksp", name = "symbol-processing-api", version.ref = "ksp" }
