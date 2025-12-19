@@ -1,6 +1,5 @@
 package re.limus.timas.hook
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.View
@@ -8,6 +7,7 @@ import re.limus.timas.R
 import re.limus.timas.annotations.ApiItems
 import re.limus.timas.hook.base.XBridge
 import re.limus.timas.hook.utils.XLog
+import re.limus.timas.hook.utils.getDrawableIdByName
 import re.limus.timas.ui.SettingActivity
 import top.sacz.xphelper.XpHelper.classLoader
 import top.sacz.xphelper.dexkit.DexFinder
@@ -35,7 +35,6 @@ object InjectSetting : XBridge() {
         }
     }
 
-    @SuppressLint("DiscouragedApi")
     private fun processSettingList(context: Context, originalResult: List<*>): List<Any?>? {
         try {
             val itemGroupList = originalResult.toMutableList()
@@ -58,11 +57,7 @@ object InjectSetting : XBridge() {
                     val itemClass = firstItem.javaClass
 
                     // 获取TIM内部图标资源ID
-                    val iconResId = context.resources.getIdentifier(
-                        "qui_tuning",
-                        "drawable",
-                        context.packageName
-                    )
+                    val iconResId = getDrawableIdByName(context, "qui_tuning")
 
                     // 创建设置项
                     val item = DexFinder.findMethod {
