@@ -20,10 +20,9 @@ object ShowAccurateGaggedTime: SwitchHook() {
     override fun onHook(ctx: Context, loader: ClassLoader) {
         DexFinder.findMethod {
             declaredClass = "com.tencent.qqnt.troop.impl.TroopGagUtils".toClass()
+            methodName = "remainingTimeToStringCountDown"
             parameters = arrayOf(Long::class.java)
-            returnType = String::class.java
         }.hookBefore {
-
             val time = args[0].cast<Long>()
             result = if (time <= 0) {
                 "0秒"
