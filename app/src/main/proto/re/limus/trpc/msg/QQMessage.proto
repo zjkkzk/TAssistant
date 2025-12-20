@@ -1,6 +1,6 @@
 syntax = "proto3";
-package io.live.trpc.msg;
-option java_package = "io.live.trpc.msg";
+package re.limus.trpc.msg;
+option java_package = "re.limus.trpc.msg";
 
 message QQMessage {
   MessageHead messageHead = 1;

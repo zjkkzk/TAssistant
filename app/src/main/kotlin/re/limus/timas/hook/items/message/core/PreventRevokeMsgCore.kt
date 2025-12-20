@@ -8,9 +8,9 @@ import re.limus.timas.hook.items.message.PreventRevokeMsg
 import re.limus.timas.hook.items.message.helper.GroupNickResolver
 import re.limus.timas.hook.items.message.helper.LocalGrayTips
 import re.limus.timas.hook.utils.XLog
-import io.live.trpc.msg.InfoSyncPushOuterClass
-import io.live.trpc.msg.MsgPushOuterClass
-import io.live.trpc.msg.QQMessageOuterClass
+import re.limus.trpc.msg.InfoSyncPushOuterClass
+import re.limus.trpc.msg.MsgPushOuterClass
+import re.limus.trpc.msg.QQMessageOuterClass
 import top.sacz.xphelper.XpHelper.classLoader
 import java.lang.reflect.Proxy
 
