@@ -31,3 +31,17 @@
 
 # ProtoBuf 相关
 -keepclassmembers public class * extends com.google.protobuf.MessageLite {*;}
+
+# 动态字节库 不排除可能会 java.lang.ExceptionInInitializerError
+-keep class net.bytebuddy.** {*;}
+
+# java.lang.IllegalStateException: Could not resolve dispatcher: j1.b.translate [class h1.a, class [B, class j1.a, class i1.a, class com.android.dx.dex.file.c]
+-keep class com.android.dx.** {*;}
+
+# Base
+-dontwarn javax.**
+-dontwarn java.**
+
+# ByteBuddy
+-dontwarn com.sun.**
+-dontwarn edu.umd.**
