@@ -26,7 +26,7 @@ TAssistant 是一个主要目的以促进 TIM体验 为主的 Xposed 模块
 
 ### 许可证
 
-- [GNU General Public License v3.0](LICENSE.txt)
+- [GNU General Public License v3.0](https://github.com/relimus/TAssistant/blob/main/LICENSE.txt)
 
 ```
 请务必仔细阅读和理解许可协议书中规定的所有权利和限制。
@@ -42,10 +42,9 @@ TAssistant 是一个主要目的以促进 TIM体验 为主的 Xposed 模块
 ```
 
 ## 发行渠道
-
-TAssistant 目前仅在 Telegram Channel 与 Github Releases 发布更新
-
-后续可能会发布到 LSPosed 仓库 (?)
+- Telegram Channel
+- Github Releases
+- LSPosed Modules Repo
 
 ## 编译
 
