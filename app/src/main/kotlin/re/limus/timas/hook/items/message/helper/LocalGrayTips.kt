@@ -2,6 +2,9 @@ package re.limus.timas.hook.items.message.helper
 
 import re.limus.timas.hook.utils.XLog
 import top.sacz.xphelper.XpHelper.classLoader
+import top.sacz.xphelper.dexkit.DexFinder
+import top.sacz.xphelper.ext.toClass
+import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
 /**
@@ -11,18 +14,34 @@ object LocalGrayTips {
 
     sealed interface Node {
         data class Text(val text: String, val col: String = "1") : Node
-        data class Member(
-            val uid: String,
-            val uin: String,
-            val nick: String,
-            val col: String = "3"
-        ) : Node
-        data class MsgRef(
-            val text: String,
-            val seq: Long,
-            val col: String = "3"
-        ) : Node
+        data class Member(val uid: String, val uin: String, val nick: String, val col: String = "3") : Node
+        data class MsgRef(val text: String, val seq: Long, val col: String = "3") : Node
     }
+
+    private val msgConstCls by lazy { "com.tencent.qqnt.kernel.nativeinterface.MsgConstant".toClass() }
+    private val busiCls by lazy { "com.tencent.qqnt.kernel.nativeinterface.JsonGrayBusiId".toClass() }
+    private val contactCls by lazy { "com.tencent.qqnt.kernelpublic.nativeinterface.Contact".toClass() }
+    private val elementCls by lazy { "com.tencent.qqnt.kernelpublic.nativeinterface.JsonGrayElement".toClass() }
+
+    private val contactCtor by lazy {
+        DexFinder.findMethod {
+            declaredClass = contactCls
+            paramCount = 3
+            parameters = arrayOf(Int::class.java, String::class.java, String::class.java)
+        }.firstConstructorOrNull() ?: DexFinder.findMethod {
+            declaredClass = contactCls
+            paramCount = 2
+            parameters = arrayOf(Int::class.java, String::class.java)
+        }.firstConstructorOrNull()
+    }
+
+    private val elementCtor by lazy {
+        val xmlParamCls = runCatching { "com.tencent.qqnt.kernelpublic.nativeinterface.XmlToJsonParam".toClass() }.getOrNull()
+        elementCls.getConstructor(Long::class.javaPrimitiveType, String::class.java, String::class.java, Boolean::class.javaPrimitiveType, xmlParamCls)
+    }
+
+    private var cachedAddMethod: Method? = null
+    private var cachedProxy: Any? = null
 
     /**
      * 发送本地灰字（通过 wrapperSession -> msgService -> addLocalJsonGrayTipMsg）
@@ -32,96 +51,45 @@ object LocalGrayTips {
      * @param items          节点列表：Text/Member/MsgRef
      * @param recentAbstract 最近会话摘要文本
      */
-    fun send(
-        wrapperSession: Any,
-        chatTypeField: String,
-        id: String,
-        items: List<Node>,
-        recentAbstract: String
-    ) {
+    fun send(wrapperSession: Any, chatTypeField: String, id: String, items: List<Node>, recentAbstract: String) {
         runCatching {
-            // msgService
-            val msgService = wrapperSession.javaClass.getMethod("getMsgService").invoke(wrapperSession)
-                ?: return
-
-            // chatType（保持使用 kernel.nativeinterface.MsgConstant）
-            val msgConstCls = classLoader.loadClass("com.tencent.qqnt.kernel.nativeinterface.MsgConstant")
+            val msgService = wrapperSession.javaClass.getMethod("getMsgService").invoke(wrapperSession) ?: return
             val chatType = msgConstCls.getField(chatTypeField).getInt(null)
 
-            // Contact/JsonGrayElement：固定使用 kernelpublic 命名空间
-            val contactClassName = "com.tencent.qqnt.kernelpublic.nativeinterface.Contact"
-            val jsonGrayElementClassName = "com.tencent.qqnt.kernelpublic.nativeinterface.JsonGrayElement"
-            val contactCls = classLoader.loadClass(contactClassName)
-            val ctor3 = contactCls.constructors.firstOrNull {
-                it.parameterTypes.size == 3 &&
-                        it.parameterTypes[0] == Int::class.javaPrimitiveType &&
-                        it.parameterTypes[1] == String::class.java &&
-                        it.parameterTypes[2] == String::class.java
-            }
-            val ctor2 = contactCls.constructors.firstOrNull {
-                it.parameterTypes.size == 2 &&
-                        it.parameterTypes[0] == Int::class.javaPrimitiveType &&
-                        it.parameterTypes[1] == String::class.java
-            }
-            val contact = when {
-                ctor3 != null -> ctor3.newInstance(chatType, id, "")
-                ctor2 != null -> ctor2.newInstance(chatType, id)
-                else -> contactCls.getConstructor(
-                    Int::class.javaPrimitiveType,
-                    String::class.java,
-                    String::class.java
-                ).newInstance(chatType, id, "")
+            val contact = if (contactCtor.parameterTypes.size == 3) {
+                contactCtor.newInstance(chatType, id, "")
+            } else {
+                contactCtor.newInstance(chatType, id)
             }
 
-            // 选择 busiId（群聊/单聊），失败回退 ROBOT_SAFETY_TIP
-            val busiCls = classLoader.loadClass("com.tencent.qqnt.kernel.nativeinterface.JsonGrayBusiId")
-            val busiField = when (chatTypeField) {
-                "KCHATTYPEGROUP" -> runCatching { busiCls.getField("AIO_AV_GROUP_NOTICE") }.getOrNull()
-                else -> runCatching { busiCls.getField("AIO_AV_C2C_NOTICE") }.getOrNull()
-            } ?: runCatching { busiCls.getField("AIO_ROBOT_SAFETY_TIP") }.getOrNull()
-            val busiId = (busiField?.getInt(null)) ?: 0
+            val busiFieldName = if (chatTypeField == "KCHATTYPEGROUP") "AIO_AV_GROUP_NOTICE" else "AIO_AV_C2C_NOTICE"
+            val busiId = runCatching { busiCls.getField(busiFieldName).getInt(null) }
+                .getOrElse { busiCls.getField("AIO_ROBOT_SAFETY_TIP").getInt(null) }
 
-            // 构造 JSON items
-            val jsonItems = buildString {
-                append("[")
-                items.forEachIndexed { index, node ->
-                    if (index > 0) append(",")
-                    when (node) {
-                        is Node.Text -> append("{" + "\"_type\":\"_text\",\"type\":\"nor\",\"txt\":\"" + node.text.replace("\"","\\\"") + "\",\"col\":\"" + node.col + "\"}")
-                        is Node.Member -> append("{" + "\"_type\":\"_member\",\"type\":\"qq\",\"uid\":\"" + node.uid + "\",\"jp\":\"" + node.uid + "\",\"uin\":\"" + node.uin + "\",\"tp\":\"0\",\"nm\":\"" + node.nick.replace("\"","\\\"") + "\",\"col\":\"" + node.col + "\"}")
-                        is Node.MsgRef -> append("{" + "\"_type\":\"_url\",\"type\":\"url\",\"txt\":\"" + node.text.replace("\"","\\\"") + "\",\"local_jp\":58,\"param\":{\"seq\":" + node.seq + "},\"col\":\"" + node.col + "\"}")
-                    }
-                }
-                append("]")
-            }
-            val json = "{\"align\":\"center\",\"items\":$jsonItems}"
+            val json = """{"align":"center","items":[${items.joinToString(",") { it.toJson() }}]}"""
+            val element = elementCtor.newInstance(busiId.toLong(), json, recentAbstract, false, null)
 
-            // JsonGrayElement
-            val elementCls = classLoader.loadClass(jsonGrayElementClassName)
-            val xmlParamCls = runCatching { classLoader.loadClass(jsonGrayElementClassName.replace("JsonGrayElement","XmlToJsonParam")) }.getOrNull()
-            val element = elementCls.getConstructor(
-                Long::class.javaPrimitiveType,
-                String::class.java,
-                String::class.java,
-                Boolean::class.javaPrimitiveType,
-                xmlParamCls
-            ).newInstance(busiId.toLong(), json, recentAbstract, false, null)
-
-            // 调用 addLocalJsonGrayTipMsg
-            val addMethod = msgService.javaClass.methods.firstOrNull { m ->
-                m.name == "addLocalJsonGrayTipMsg" && m.parameterTypes.size == 5 &&
-                        m.parameterTypes[0].name == contactClassName
-            } ?: return
+            val addMethod = cachedAddMethod ?: DexFinder.findMethod {
+                declaredClass = msgService.javaClass
+                methodName = "addLocalJsonGrayTipMsg"
+                paramCount = 5
+            }.firstOrNull()?.also { cachedAddMethod = it } ?: return
 
             runCatching {
                 addMethod.invoke(msgService, contact, element, true, true, null)
             }.onFailure {
                 val cbType = addMethod.parameterTypes[4]
-                val proxy = Proxy.newProxyInstance(classLoader, arrayOf(cbType)) { _, _, _ -> null }
+                val proxy = cachedProxy ?: Proxy.newProxyInstance(classLoader, arrayOf(cbType)) { _, _, _ -> null }.also { cachedProxy = it }
                 addMethod.invoke(msgService, contact, element, true, true, proxy)
             }
-        }.onFailure { e ->
-            XLog.e(e)
-        }
+        }.onFailure { XLog.e(it) }
     }
+
+    private fun Node.toJson(): String = when (this) {
+        is Node.Text -> """{"_type":"_text","type":"nor","txt":"${text.esc()}","col":"$col"}"""
+        is Node.Member -> """{"_type":"_member","type":"qq","uid":"$uid","jp":"$uid","uin":"$uin","tp":"0","nm":"${nick.esc()}","col":"$col"}"""
+        is Node.MsgRef -> """{"_type":"_url","type":"url","txt":"${text.esc()}","local_jp":58,"param":{"seq":$seq},"col":"$col"}"""
+    }
+
+    private fun String.esc() = replace("\"", "\\\"")
 }
