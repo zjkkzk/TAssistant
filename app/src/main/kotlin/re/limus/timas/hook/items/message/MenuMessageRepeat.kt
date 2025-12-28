@@ -17,11 +17,9 @@ object MenuMessageRepeat : SwitchHook(), OnMenuBuilder {
 
     override val name = "在消息长按菜单添加复读"
 
-    override val description = "人类的本质是■■■ (需要重启TIM)"
+    override val description = "人类的本质是■■■"
 
     override val category = UiCategory.MESSAGE
-
-    override val needRestart = true
 
     override fun onHook(ctx: Context, loader: ClassLoader) {
         //什么都不用写

@@ -5,6 +5,7 @@ import de.robv.android.xposed.XC_MethodHook
 import re.limus.timas.annotations.ApiItems
 import re.limus.timas.hook.base.SwitchHook
 import re.limus.timas.hook.base.XBridge
+import re.limus.timas.hook.manager.HookManager
 import java.lang.reflect.Modifier
 
 @ApiItems
@@ -36,10 +37,8 @@ object MenuBuilderApi : XBridge() {
                     baseClass.getDeclaredMethod(getMsgMethodName).apply { isAccessible = true }
                 val aioMsgItem = getMsgMethod.invoke(thisObject)!!
                 for (decorator in decorators) {
-                    if (decorator is SwitchHook) {
-                        if (!decorator.isLoad) {
-                            continue
-                        }
+                    if (decorator is SwitchHook && !HookManager.isEnabled(decorator)) {
+                        continue
                     }
                     if (target in decorator.targetTypes) {
                         decorator.onGetMenu(aioMsgItem, target, this)
