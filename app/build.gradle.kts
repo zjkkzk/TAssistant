@@ -52,7 +52,7 @@ android {
         minSdk = 27
         targetSdk = 36
         versionCode = providers.provider { getBuildVersionCode(rootProject) }.get()
-        versionName = "v1.2.01"
+        versionName = "v1.2.1"
 
         ndk {
             abiFilters.add("arm64-v8a")
