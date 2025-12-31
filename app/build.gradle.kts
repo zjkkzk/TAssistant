@@ -114,8 +114,14 @@ protobuf {
     }
 }
 lsparanoid {
-    seed = 1209
-    classFilter = { true }
-    includeDependencies = false
-    variantFilter = { true }
+    variantFilter = { variant ->
+        if (variant.buildType == "release") {
+            seed = 1209
+            classFilter = { true }
+            includeDependencies = false
+            true
+        } else {
+            false
+        }
+    }
 }
