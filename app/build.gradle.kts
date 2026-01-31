@@ -1,3 +1,6 @@
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.DynamicFeatureExtension
+import com.android.build.gradle.AppExtension
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import org.gradle.api.provider.ValueSource
@@ -6,6 +9,12 @@ import org.gradle.process.ExecOperations
 import org.gradle.api.Project
 import java.io.File
 
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.protobuf)
+    alias(libs.plugins.ksp)
+    id("org.lsposed.lsparanoid")
+}
 abstract class GitCommitCount : ValueSource<Int, ValueSourceParameters.None> {
     @get:Inject abstract val execOperations: ExecOperations
 
@@ -35,15 +44,7 @@ abstract class GitShortHash : ValueSource<String, ValueSourceParameters.None> {
 val gitCommitCount = providers.of(GitCommitCount::class.java) {}!!
 val gitShortHash = providers.of(GitShortHash::class.java) {}!!
 
-plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.protobuf)
-    alias(libs.plugins.ksp)
-    id("org.lsposed.lsparanoid")
-}
-
-android {
+extensions.configure<ApplicationExtension> {
     namespace = "re.limus.timas"
     compileSdk = 36
 
@@ -103,7 +104,9 @@ android {
             "--package-id", "0xf2"
         )
     }
+}
 
+configure<AppExtension> {
     applicationVariants.all {
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl

@@ -1,7 +1,7 @@
 [versions]
 
 # Plugins
-agp = "9.1.0-alpha07"
+agp = "9.0.0"
 kotlin = "2.3.0"
 protobuf = "0.9.6"
 ksp = "2.3.5"
@@ -32,6 +32,7 @@ protobuf-javalite = "4.33.5"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 # LSParanoid
@@ -58,7 +59,6 @@ protobuf-java-lite = { group = "com.google.protobuf", name = "protobuf-java", ve
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
